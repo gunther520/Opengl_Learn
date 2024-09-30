@@ -61,36 +61,43 @@ int main() {
     //gl is a state machine, so we can set the state of OpenGL by calling appropriate functions
 
     float vertices[] = {
+         0.75f,  0.75f, 0.0f, // top right
+         0.15f, -0.70f, 0.0f, // bottom right
+        -0.05f, -0.75f, 0.0f, // bottom left
+    };
+
+    float vertices2[] = {
          0.5f,  0.5f, 0.0f, // top right
          0.5f, -0.5f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f  // top left
-    };
-    unsigned int indices[] = { // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
     };
 
+
 // !!!! The sequence of the objects is important!!!!
 // !!!! The sequence of the objects is important!!!!
 // !!!! The sequence of the objects is important!!!!
 
-    unsigned int VAO; // Usage: determine how to retrieve the vertex data
-    glGenVertexArrays(1, &VAO);
-    // Binding change the state of Vertex_Array_Buffer Target
-    glBindVertexArray(VAO);
+    unsigned int VAO[2]; // Usage: determine how to retrieve the vertex data
+    glGenVertexArrays(2, VAO);
 
-    unsigned int VBO; // Vertex Buffer Object (VBO) ID  
-    glGenBuffers(1, &VBO); // Generate 1 buffer object and store its ID in VBO
+    unsigned int VBO[2]; // Vertex Buffer Object (VBO) ID  
+    glGenBuffers(2, VBO); // Generate 1 buffer object and store its ID in VBO
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO); // Bind the buffer object to the GL_ARRAY_BUFFER target 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Copy the vertex data into the buffer's memory
-    // The vertex data is now stored in the buffer's memory on the GPU
+    glBindVertexArray(VAO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+        (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
 
-    unsigned int EBO; // Element Buffer Object (EBO) ID
-    glGenBuffers(1, &EBO); // Generate 1 buffer object and store its ID in EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); // Copy the vertex data into the buffer's memory
+    glBindVertexArray(VAO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+        (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
 
 
 //Why Binding is important? So that openGL can use the state to draw the object
@@ -123,10 +130,23 @@ int main() {
 		"{\n"
 		" FragColor = vec4(0.5f, 0.5f, 0.2f, 1.0f);\n"
 		"}\0";
+
+    const char* fragmentShaderSource2 = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        " FragColor = vec4(1.0f, 0.9f, 0.8f, 1.0f);\n"
+        "}\0";
+
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
+
+    unsigned int fragmentShader2;
+    fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader2, 1, &fragmentShaderSource2, NULL);
+    glCompileShader(fragmentShader2);
 
     //-------------------Create a shader program-------------------
     // Link the vertex and fragment shaders or any other shaders into a shader program
@@ -136,14 +156,22 @@ int main() {
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
+
+    unsigned int shaderProgram2;
+    shaderProgram2 = glCreateProgram();
+    glAttachShader(shaderProgram2, vertexShader);
+    glAttachShader(shaderProgram2, fragmentShader2);
+    glLinkProgram(shaderProgram2);
+
+
+
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShader2);
     
     // Tell OpenGL how to interpret the vertex data in this case 3 floats per positional vertex
     //This will update VAO we defined earlier's state, it also stores the VBO Target's state in VAO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-        (void*)0);
+
 
     /*The following code is for the case where we have 6 floats per vertex, 3 for position and 3 for color
     * -------------------Tell OpenGL how to interpret the vertex data-------------------
@@ -152,7 +180,6 @@ int main() {
     //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)( 3 * sizeof(float) ));
     */
 
-    glEnableVertexAttribArray(0);
     
 
     // Render loop one iteration is called a frame
@@ -173,12 +200,22 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glBindVertexArray(VAO[1]);
+        glUseProgram(shaderProgram2);
         
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glBindVertexArray(0);
+
+        glBindVertexArray(VAO[0]);
+        glUseProgram(shaderProgram);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        
+        
+
+        
+
 
         // Render commands here
         glfwPollEvents(); // Check if any events are triggered (like keyboard input or mouse movement events)
