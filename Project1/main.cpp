@@ -61,14 +61,14 @@ int main() {
     //gl is a state machine, so we can set the state of OpenGL by calling appropriate functions
 
     float vertices[] = {
-         0.5f,  0.5f, 0.0f, // top right
-         0.5f, -0.5f, 0.0f, // bottom right
+         0.0f,  0.0f, 0.0f, // top middle
+         0.0f, -0.5f, 0.0f, // bottom middle
         -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f  // top left
+         0.5f, -0.5f, 0.0f  // bottom right
     };
     unsigned int indices[] = { // note that we start from 0!
         0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        0, 1, 2  // second triangle
     };
 
 // !!!! The sequence of the objects is important!!!!
