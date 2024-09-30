@@ -59,11 +59,22 @@ int main() {
 
     //-------------------Create a vertex buffer object store in GPU-------------------
     //gl is a state machine, so we can set the state of OpenGL by calling appropriate functions
+
     float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f
+         0.5f,  0.5f, 0.0f, // top right
+         0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f  // top left
     };
+    unsigned int indices[] = { // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+
+// !!!! The sequence of the objects is important!!!!
+// !!!! The sequence of the objects is important!!!!
+// !!!! The sequence of the objects is important!!!!
+
     unsigned int VAO; // Usage: determine how to retrieve the vertex data
     glGenVertexArrays(1, &VAO);
     // Binding change the state of Vertex_Array_Buffer Target
@@ -76,7 +87,13 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Copy the vertex data into the buffer's memory
     // The vertex data is now stored in the buffer's memory on the GPU
 
-    //Why Binding is important? So that openGL can use the state to draw the object
+    unsigned int EBO; // Element Buffer Object (EBO) ID
+    glGenBuffers(1, &EBO); // Generate 1 buffer object and store its ID in EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); // Copy the vertex data into the buffer's memory
+
+
+//Why Binding is important? So that openGL can use the state to draw the object
 
     //-------------------Create a vertex shader Change Vertex Value-------------------
     const char* vertexShaderSource = "#version 330 core\n"
@@ -157,7 +174,11 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         // Render commands here
         glfwPollEvents(); // Check if any events are triggered (like keyboard input or mouse movement events)
