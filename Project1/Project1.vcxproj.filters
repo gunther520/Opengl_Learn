@@ -21,6 +21,9 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\GLFW\glfw3.h">
@@ -35,5 +38,14 @@
     <ClInclude Include="dependencies\include\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\fragmentShader1.txt" />
+    <Text Include="res\vertexShader1.txt" />
+    <Text Include="res\vertexShader2.txt" />
+    <Text Include="res\fragmentShader2.txt" />
   </ItemGroup>
 </Project>

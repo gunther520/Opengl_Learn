@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <random>
+#include "shader.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -108,83 +109,11 @@ int main() {
 
 //Why Binding is important? So that openGL can use the state to draw the object
 
-    //-------------------Create a vertex shader Change Vertex Value-------------------
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
 
-    const char* vertexShaderSource2 = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aColor;\n"
-		"out vec3 ourColor;\n"
-		"void main()\n"
-		"{\n"
-		" gl_Position = vec4(aPos, 1.0);\n"
-		" ourColor = aColor;\n"
-		"}\0";
+    Shader ourShader1("res/vertexShader1.txt", "res/fragmentShader1.txt");
+    Shader ourShader2("res/vertexShader2.txt", "res/fragmentShader2.txt");
 
 
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    unsigned int vertexShader2;
-    vertexShader2 = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader2, 1, &vertexShaderSource2, NULL);
-    glCompileShader(vertexShader2);
-
-
-    //-------------------Create a fragment shader Change Pixels' Color-------------------
-    const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		" FragColor = vec4(0.5f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0";
-
-    const char* fragmentShaderSource2 = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "in vec3 ourColor;\n"
-        "void main()\n"
-        "{\n"
-        " FragColor = vec4(ourColor, 1.0);\n"
-        "}\0";
-
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    unsigned int fragmentShader2;
-    fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader2, 1, &fragmentShaderSource2, NULL);
-    glCompileShader(fragmentShader2);
-
-    //-------------------Create a shader program-------------------
-    // Link the vertex and fragment shaders or any other shaders into a shader program
-    // A shader program is an executable that runs on the GPU
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    unsigned int shaderProgram2;
-    shaderProgram2 = glCreateProgram();
-    glAttachShader(shaderProgram2, vertexShader2);
-    glAttachShader(shaderProgram2, fragmentShader2);
-    glLinkProgram(shaderProgram2);
-
-
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(fragmentShader2);
-    
     // Tell OpenGL how to interpret the vertex data in this case 3 floats per positional vertex
     //This will update VAO we defined earlier's state, it also stores the VBO Target's state in VAO
 
@@ -219,13 +148,13 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(VAO[1]);
-        glUseProgram(shaderProgram2);
+        ourShader2.use();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
 
         glBindVertexArray(VAO[0]);
-        glUseProgram(shaderProgram);
+        ourShader1.use();
         glDrawArrays(GL_TRIANGLES, 0, 3);
         
         

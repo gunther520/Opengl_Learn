@@ -141,12 +141,20 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h" />
     <ClInclude Include="dependencies\include\GLFW\glfw3.h" />
     <ClInclude Include="dependencies\include\GLFW\glfw3native.h" />
     <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
+    <ClInclude Include="shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\fragmentShader1.txt" />
+    <Text Include="res\fragmentShader2.txt" />
+    <Text Include="res\vertexShader1.txt" />
+    <Text Include="res\vertexShader2.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
