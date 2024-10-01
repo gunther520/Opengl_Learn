@@ -149,6 +149,7 @@ int main() {
 
         glBindVertexArray(VAO[1]);
         ourShader2.use();
+        ourShader2.setFloat("offset", -0.3f);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
