@@ -133,9 +133,9 @@ int main() {
 
     const char* fragmentShaderSource2 = "#version 330 core\n"
         "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        " FragColor = vec4(1.0f, 0.9f, 0.8f, 1.0f);\n"
+        "uniform vec4 ourColor; // we set this variable in the OpenGL code.\n"
+        "void main() {\n"
+        "FragColor = ourColor;\n"
         "}\0";
 
     unsigned int fragmentShader;
@@ -197,12 +197,21 @@ int main() {
         //float r = dis(gen);
         //float g = dis(gen);
         //float b = dis(gen);
+        
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(VAO[1]);
-        glUseProgram(shaderProgram2);
         
+        //uniforms are another way to pass data from our application on the CPU to the shaders on the GPU
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram2, "ourColor");
+        glUseProgram(shaderProgram2);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        //the above code is to change the color of the triangle dynamically
+
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
