@@ -67,9 +67,10 @@ int main() {
     };
 
     float vertices2[] = {
-         0.5f,  0.5f, 0.0f, // top right
-         0.5f, -0.5f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
+        // positions         // colors
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top
     };
 
 
@@ -89,14 +90,19 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
         (void*)0);
     glEnableVertexAttribArray(0);
+
     glBindVertexArray(0);
 
     glBindVertexArray(VAO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
         (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+		(void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
 
@@ -109,19 +115,28 @@ int main() {
         "{\n"
         " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
         "}\0";
+
+    const char* vertexShaderSource2 = "#version 330 core\n"
+		"layout (location = 0) in vec3 aPos;\n"
+		"layout (location = 1) in vec3 aColor;\n"
+		"out vec3 ourColor;\n"
+		"void main()\n"
+		"{\n"
+		" gl_Position = vec4(aPos, 1.0);\n"
+		" ourColor = aColor;\n"
+		"}\0";
+
+
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
+    unsigned int vertexShader2;
+    vertexShader2 = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader2, 1, &vertexShaderSource2, NULL);
+    glCompileShader(vertexShader2);
+
 
     //-------------------Create a fragment shader Change Pixels' Color-------------------
     const char* fragmentShaderSource = "#version 330 core\n"
@@ -133,9 +148,10 @@ int main() {
 
     const char* fragmentShaderSource2 = "#version 330 core\n"
         "out vec4 FragColor;\n"
-        "uniform vec4 ourColor; // we set this variable in the OpenGL code.\n"
-        "void main() {\n"
-        "FragColor = ourColor;\n"
+        "in vec3 ourColor;\n"
+        "void main()\n"
+        "{\n"
+        " FragColor = vec4(ourColor, 1.0);\n"
         "}\0";
 
     unsigned int fragmentShader;
@@ -159,7 +175,7 @@ int main() {
 
     unsigned int shaderProgram2;
     shaderProgram2 = glCreateProgram();
-    glAttachShader(shaderProgram2, vertexShader);
+    glAttachShader(shaderProgram2, vertexShader2);
     glAttachShader(shaderProgram2, fragmentShader2);
     glLinkProgram(shaderProgram2);
 
@@ -203,22 +219,13 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(VAO[1]);
-        
-        //uniforms are another way to pass data from our application on the CPU to the shaders on the GPU
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram2, "ourColor");
         glUseProgram(shaderProgram2);
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        //the above code is to change the color of the triangle dynamically
-
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
 
         glBindVertexArray(VAO[0]);
         glUseProgram(shaderProgram);
-        
         glDrawArrays(GL_TRIANGLES, 0, 3);
         
         
