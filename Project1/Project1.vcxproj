@@ -158,6 +158,7 @@
     <Text Include="res\vertexShader2.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\awesomeface.png" />
     <Image Include="res\container.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

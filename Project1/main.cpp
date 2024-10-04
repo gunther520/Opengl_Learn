@@ -146,9 +146,10 @@ int main() {
     Shader ourShader2("res/vertexShader2.txt", "res/fragmentShader2.txt");
 
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    unsigned int texture[2];
+    glGenTextures(2, texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture[0]);
     // set the texture wrapping/filtering options (on currently bound texture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -170,6 +171,29 @@ int main() {
     stbi_image_free(data);
 
 
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
+    // set the texture wrapping/filtering options (on currently bound texture)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    data = stbi_load("res/awesomeface.png", &width, &height,
+        &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+            GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+
+
+
     // Tell OpenGL how to interpret the vertex data in this case 3 floats per positional vertex
     //This will update VAO we defined earlier's state, it also stores the VBO Target's state in VAO
 
@@ -181,7 +205,10 @@ int main() {
     //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)( 3 * sizeof(float) ));
     */
 
-    
+    ourShader2.use();
+    glUniform1i(glGetUniformLocation(ourShader2.ID, "texture1"), 0); // manually
+    ourShader2.setInt("texture2", 1);
+
 
     // Render loop one iteration is called a frame
     while (!glfwWindowShouldClose(window))
@@ -203,8 +230,14 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture[1]);
         ourShader2.use();
+
+
+
         glBindVertexArray(VAO[1]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
