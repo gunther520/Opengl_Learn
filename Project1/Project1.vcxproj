@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -148,6 +148,7 @@
     <ClInclude Include="dependencies\include\GLFW\glfw3.h" />
     <ClInclude Include="dependencies\include\GLFW\glfw3native.h" />
     <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
+    <ClInclude Include="dependencies\include\stb_image\stb_image.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,9 @@
     <Text Include="res\fragmentShader2.txt" />
     <Text Include="res\vertexShader1.txt" />
     <Text Include="res\vertexShader2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\container.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
