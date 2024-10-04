@@ -95,10 +95,7 @@ int main() {
 // !!!! The sequence of the objects is important!!!!
 // !!!! The sequence of the objects is important!!!!
 
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 
 
     unsigned int VAO[2]; // Usage: determine how to retrieve the vertex data
@@ -106,6 +103,9 @@ int main() {
 
     unsigned int VBO[2]; // Vertex Buffer Object (VBO) ID  
     glGenBuffers(2, VBO); // Generate 1 buffer object and store its ID in VBO
+
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
@@ -118,6 +118,10 @@ int main() {
 
     glBindVertexArray(VAO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
@@ -132,13 +136,14 @@ int main() {
     glBindVertexArray(0);
 
 
+    
+
+
 //Why Binding is important? So that openGL can use the state to draw the object
 
 
     Shader ourShader1("res/vertexShader1.txt", "res/fragmentShader1.txt");
     Shader ourShader2("res/vertexShader2.txt", "res/fragmentShader2.txt");
-
-
 
 
     unsigned int texture;
@@ -147,7 +152,7 @@ int main() {
     // set the texture wrapping/filtering options (on currently bound texture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
@@ -198,15 +203,12 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
         glBindTexture(GL_TEXTURE_2D, texture);
-        
+        ourShader2.use();
         glBindVertexArray(VAO[1]);
-      
-        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
+     
         glBindVertexArray(0);
         glBindVertexArray(VAO[0]);
         ourShader1.use();
